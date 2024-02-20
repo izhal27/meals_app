@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:meals/screen/categories.dart';
 import 'package:meals/screen/meals.dart';
+import 'package:meals/widgets/main_drawer.dart';
+
+enum ScreenName { meals, filters }
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -18,6 +22,15 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  void _selectScreen(ScreenName screenName) {
+    switch (screenName) {
+      case ScreenName.meals:
+        Navigator.of(context).pop();
+        break;
+      case ScreenName.filters:
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget activeScreen = const CategoriesScreen();
@@ -33,6 +46,7 @@ class _TabsScreenState extends State<TabsScreen> {
         title: Text(activeScreenTitle),
       ),
       body: activeScreen,
+      drawer: MainDrawer(onSelectScreen: _selectScreen),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _setActiveScreen,
         currentIndex: _activeScreenIndex,
