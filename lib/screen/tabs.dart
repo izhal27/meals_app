@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:meals/data/dummy_data.dart';
+import 'package:meals/model/meal.dart';
 import 'package:meals/screen/categories.dart';
 import 'package:meals/screen/filters.dart';
 import 'package:meals/screen/meals.dart';
@@ -24,6 +26,7 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   var _activeScreenIndex = 0;
   Map<Filter, bool> _selectedFilters = kInitialFilters;
+  final List<Meal> _favoriteMeals = [];
 
   void _setActiveScreen(int index) {
     setState(() {
@@ -52,11 +55,26 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activeScreen = const CategoriesScreen();
+    final availableMeals = dummyMeals.where((meal) {
+      if (_selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
+        return false;
+      }
+      if (_selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
+        return false;
+      }
+      if (_selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
+        return false;
+      }
+      if (_selectedFilters[Filter.vegan]! && !meal.isVegan) {
+        return false;
+      }
+      return true;
+    }).toList();
+    Widget activeScreen = CategoriesScreen(meals: availableMeals);
     var activeScreenTitle = 'Categories';
 
     if (_activeScreenIndex == 1) {
-      activeScreen = const MealsScreen(meals: []);
+      activeScreen = MealsScreen(meals: _favoriteMeals);
       activeScreenTitle = 'Makanan Favorit';
     }
 
