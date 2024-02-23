@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meals/providers/favorite_meals_provider.dart';
+import 'package:meals/providers/filters_provider.dart';
 
-import 'package:meals/data/dummy_data.dart';
-import 'package:meals/model/meal.dart';
+import 'package:meals/providers/meals_provider.dart';
 import 'package:meals/screen/categories.dart';
 import 'package:meals/screen/filters.dart';
 import 'package:meals/screen/meals.dart';
@@ -9,24 +11,15 @@ import 'package:meals/widgets/main_drawer.dart';
 
 enum ScreenName { meals, filters }
 
-const kInitialFilters = {
-  Filter.glutenFree: false,
-  Filter.lactoseFree: false,
-  Filter.vegetarian: false,
-  Filter.vegan: false
-};
-
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   var _activeScreenIndex = 0;
-  Map<Filter, bool> _selectedFilters = kInitialFilters;
-  final List<Meal> _favoriteMeals = [];
 
   void _setActiveScreen(int index) {
     setState(() {
@@ -38,15 +31,9 @@ class _TabsScreenState extends State<TabsScreen> {
     Navigator.of(context).pop();
     switch (screenName) {
       case ScreenName.filters:
-        final result = await Navigator.of(context).push<Map<Filter, bool>>(
-          MaterialPageRoute(
-            builder: (ctx) => FiltersScreen(currentFilters: _selectedFilters),
-          ),
-        );
-
-        setState(() {
-          _selectedFilters = result ?? kInitialFilters;
-        });
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (ctx) => const FiltersScreen(),
+        ));
         break;
       case ScreenName.meals:
         break;
@@ -55,26 +42,13 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final availableMeals = dummyMeals.where((meal) {
-      if (_selectedFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
-        return false;
-      }
-      if (_selectedFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
-        return false;
-      }
-      if (_selectedFilters[Filter.vegetarian]! && !meal.isVegetarian) {
-        return false;
-      }
-      if (_selectedFilters[Filter.vegan]! && !meal.isVegan) {
-        return false;
-      }
-      return true;
-    }).toList();
-    Widget activeScreen = CategoriesScreen(meals: availableMeals);
+    final meals = ref.watch(filteredMealsProvider);
+    Widget activeScreen = CategoriesScreen(meals: meals);
     var activeScreenTitle = 'Categories';
 
     if (_activeScreenIndex == 1) {
-      activeScreen = MealsScreen(meals: _favoriteMeals);
+      final favoriteMeals = ref.watch(favoriteMealsProvider);
+      activeScreen = MealsScreen(meals: favoriteMeals);
       activeScreenTitle = 'Makanan Favorit';
     }
 
