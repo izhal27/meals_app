@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meals/providers/favorite_meals_provider.dart';
-import 'package:meals/providers/filters_provider.dart';
 
-import 'package:meals/providers/meals_provider.dart';
 import 'package:meals/screen/categories.dart';
 import 'package:meals/screen/filters.dart';
 import 'package:meals/screen/meals.dart';
 import 'package:meals/widgets/main_drawer.dart';
+import 'package:meals/providers/favorite_meals_provider.dart';
+import 'package:meals/providers/filters_provider.dart';
 
 enum ScreenName { meals, filters }
 
